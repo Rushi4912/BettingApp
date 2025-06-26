@@ -1,0 +1,131 @@
+{
+  "name": "gambling-platform-backend",
+  "version": "1.0.0",
+  "description": "Robust gambling platform backend with Express.js, Prisma, PostgreSQL, and WebSocket support",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "build": "echo 'Build completed'",
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch --detectOpenHandles",
+    "test:coverage": "jest --coverage",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "generate": "prisma generate",
+    "lint": "eslint src/**/*.js --fix",
+    "format": "prettier --write src/**/*.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop gambling-backend",
+    "pm2:restart": "pm2 restart gambling-backend",
+    "pm2:logs": "pm2 logs gambling-backend",
+    "setup": "npm install && npx prisma generate",
+    "reset-db": "npx prisma migrate reset --force && npm run db:seed"
+  },
+  "keywords": [
+    "gambling",
+    "casino",
+    "betting",
+    "express",
+    "websocket",
+    "prisma",
+    "postgresql",
+    "nodejs",
+    "javascript"
+  ],
+  "author": "Rushikesh Pawar",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.3",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.3.1",
+    "@prisma/client": "^5.7.1",
+    "prisma": "^5.7.1",
+    "socket.io": "^4.7.4",
+    "redis": "^4.6.12",
+    "ioredis": "^5.3.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "joi": "^17.11.0",
+    "express-validator": "^7.0.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.17.3",
+    "connect-redis": "^7.1.0",
+    "uuid": "^9.0.1",
+    "crypto-js": "^4.2.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "stripe": "^14.9.0",
+    "bull": "^4.12.2",
+    "express-brute": "^1.0.1",
+    "express-brute-redis": "^0.0.1",
+    "moment": "^2.30.1",
+    "lodash": "^4.17.21",
+    "axios": "^1.6.2",
+    "express-async-errors": "^3.1.1",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rushi4912/BettingApp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rushi4912/BettingApp.git"
+  },
+  "homepage": "https://github.com/Rushi4912/BettingApp",
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/src/**/*.test.js"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "off"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2
+  }
+}
