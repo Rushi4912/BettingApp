@@ -1,5 +1,5 @@
 import express from 'express';
-const router = express.router();
+const router = express.Router();
 const authController = require('../controllers/auth');
 // const { validateLogin, validateRegister } = require('../validators/auth');
 
@@ -14,5 +14,4 @@ router.post('/refresh', authController.refreshToken);
 
 // POST /auth/logout
 router.post('/logout', authController.logout);
-
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
 import express from 'express';
-const router = express.router();
+const router = express.Router();
 
 // Import route handlers
 import authRoutes from './auth.route';
@@ -17,4 +17,4 @@ router.use('/bets', betRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/admin', adminRoutes);
 
-module.exports = router;
+export default router;
