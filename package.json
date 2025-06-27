@@ -1,0 +1,21 @@
+{
+  "name": "bettingapp-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@10.5.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "start:web": "cd ./apps/web && npm run start",
+    "start:backend": "cd ./apps/backend && npm run start",
+    "generate:db": "cd ./packages/db && npx prisma generate && cd ../."
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  }
+}
