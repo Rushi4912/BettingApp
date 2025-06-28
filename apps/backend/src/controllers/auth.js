@@ -8,7 +8,7 @@ const SALT_ROUNDS = 12;
 export const authController = {
   async register(req, res) {
     try {
-      const { username, email, password, phone, balance = 0 } = req.body;
+      const { username, email, password, phone} = req.body;
 
       // check if user exists
       const extUser = await prisma.user.findFirst({
@@ -33,13 +33,13 @@ export const authController = {
           username,
           email,
           password: hashedPassword,
-          balance: 0,
+          phone
         },
         select: {
           id: true,
           username: true,
           email: true,
-          balance: true,
+          phone=true
         },
       });
 
@@ -89,17 +89,10 @@ export const authController = {
           },
         });
       }
-      const token = req.headers.authorization;
-      console.log(token);
-      const decoded = verify(token, JWT_SECRET);
-      const userId = decoded.userId;
-
-      // Verify JWT token
-      // const res = verify({ userId: user.id }, JWT_SECRET);
 
       res.json({
         user: {
-          id: userId,
+          id: user.id,
           username: user.username,
           email: user.email,
           balance: user.balance,
