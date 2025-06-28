@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Robust gambling platform backend with Express.js, Prisma, PostgreSQL, and WebSocket support",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",

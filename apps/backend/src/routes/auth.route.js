@@ -1,16 +1,18 @@
 import express from 'express';
 const router = express.Router();
+import { authController } from '../controllers/auth';
 const authController = require('../controllers/auth');
-// const { validateLogin, validateRegister } = require('../validators/auth');
-
 // POST /auth/login
 router.post('/login', validateLogin, authController.login);
 
 // POST /auth/register
-router.post('/register', validateRegister, authController.register);
+router.post('/register', authController.register);
+
+// POST /auth/login
+router.post('/login', authController.login);
 
 // POST /auth/refresh
-router.post('/refresh', authController.refreshToken);
+// router.post('/refresh', authController.refreshToken);
 
 // POST /auth/logout
 router.post('/logout', authController.logout);
