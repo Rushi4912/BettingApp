@@ -1,4 +1,5 @@
 import express from 'express';
+const app = express();
 const router = express.Router();
 
 // Import route handlers
@@ -9,6 +10,7 @@ import betRoutes from './bets.route.js';
 import transactionRoutes from './transactions.route.js';
 import adminRoutes from './admin.route.js';
 
+app.use(express.json());
 // Mount routes
 router.use('/auth', authRoutes);
 // router.use('/users', userRoutes);

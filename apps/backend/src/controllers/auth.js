@@ -33,13 +33,21 @@ export const authController = {
           username,
           email,
           password: hashedPassword,
+
           phone
+
+       
+
         },
         select: {
           id: true,
           username: true,
           email: true,
+
           phone:true
+
+       
+
         },
       });
 
@@ -61,6 +69,7 @@ export const authController = {
   },
 
   async login(req, res) {
+    
     try {
       const { email, password } = req.body;
 
@@ -89,6 +98,7 @@ export const authController = {
           },
         });
       }
+
 
       res.json({
         user: {
