@@ -2,19 +2,19 @@ import express from 'express';
 const router = express.Router();
 
 // Import route handlers
-import authRoutes from './auth.route';
-import userRoutes from './users.route';
+import authRoutes from './auth.route.js';
+import userRoutes from './users.route.js';
 // import gameRoutes from './games.route';
-import betRoutes from './bets.route';
-import transactionRoutes from './transactions.route';
-import adminRoutes from './admin.route';
+import betRoutes from './bets.route.js';
+import transactionRoutes from './transactions.route.js';
+import adminRoutes from './admin.route.js';
 
 // Mount routes
 router.use('/auth', authRoutes);
-router.use('/users', userRoutes);
+// router.use('/users', userRoutes);
 // router.use('/games', gameRoutes);
-router.use('/bets', betRoutes);
-router.use('/transactions', transactionRoutes);
-router.use('/admin', adminRoutes);
+// router.use('/bets', betRoutes);
+// router.use('/transactions', transactionRoutes);
+// router.use('/admin', adminRoutes);
 
 export default router;

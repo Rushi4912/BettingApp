@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 
-import { gameController } from '../controllers/games';
-import { authMiddleware } from '../middlewares/auth';
+import { gameController } from '../controllers/games.js';
+import { authMiddleware } from '../middlewares/auth.js';
 
 // GET /games (Get all games)
 router.get('/', authMiddleware, gameController.getAllGames);
