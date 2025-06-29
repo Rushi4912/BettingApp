@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
-import { prisma } from '../../prisma';
+import { prisma } from '../../../../packages/db/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const SALT_ROUNDS = 12;
@@ -33,13 +33,21 @@ export const authController = {
           username,
           email,
           password: hashedPassword,
-          phone,
+
+          phone
+
+       
+
         },
         select: {
           id: true,
           username: true,
           email: true,
-          phone : true,
+
+          phone:true
+
+       
+
         },
       });
 
@@ -90,7 +98,7 @@ export const authController = {
           },
         });
       }
-    
+
 
       res.json({
         user: {

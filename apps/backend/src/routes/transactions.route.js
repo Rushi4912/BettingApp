@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 
-import { transactionController } from '../controllers/transactions';
-import { authMiddleware } from '../middlewares/auth';
+import { transactionController } from '../controllers/transactions.js';
+import { authMiddleware } from '../middlewares/auth.js';
 // import { validateDeposit, validateWithdrawal } from '../validators/transactions';
 
 // POST /transactions/deposit (Deposit funds)

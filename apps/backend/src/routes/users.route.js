@@ -1,8 +1,8 @@
 import express from 'express';
 const router = express.Router();
 
-import { userController } from '../controllers/users';
-import { authMiddleware } from '../middlewares/auth';
+import { userController } from '../controllers/users.js';
+import { authMiddleware } from '../middlewares/auth.js';
 
 
 // GET /users/me (Get current user profile)

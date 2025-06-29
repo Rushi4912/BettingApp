@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+//   password  String
+//   balance   Float    @default(0)
+//   currency  String   @default("USD")
+//   role      Role     @default(USER)
+//   status    Status   @default(ACTIVE)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+  bets          Bet[]
+  transactions  Transaction[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+model Game {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  type        GameType
+  description String
+  rules       String?
+  minBet      Float
+  maxBet      Float
+  features    String[]
+  thumbnail   String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bets          Bet[]
+}
+
+enum GameType {
+  SLOTS
+  BLACKJACK
+  ROULETTE
+  POKER
+  BACCARAT
+  CRAPS
+  KENO
+  BINGO
+  SPORTS
+  OTHER
+}
+
+model Bet {
+  id        String   @id @default(uuid())
+  amount    Float
+  result    BetResult
+  winAmount Float    @default(0)
+  parameters Json?
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  game   Game   @relation(fields: [gameId], references: [id])
+  gameId String
+}
+
+enum BetResult {
+  WIN
+  LOSS
+}
+
+model Transaction {
+  id          String     @id @default(uuid())
+  type        TransactionType
+  amount      Float
+  method      String?
+  currency    String?
+  status      TransactionStatus
+  description String?
+  createdAt   DateTime   @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
