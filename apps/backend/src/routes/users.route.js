@@ -12,9 +12,9 @@ router.get('/me', authMiddleware, userController.getProfile);
 router.put('/me', authMiddleware, userController.updateProfile);
 
 // GET /users/me/history (Get user game history)
-router.get('/me/history', authenticate, userController.getGameHistory);
+// router.get('/me/history', authMiddleware, userController.getGameHistory);
 
 // GET /users/me/statistics (Get user statistics)
-router.get('/me/statistics', authenticate, userController.getUserStats);
+// router.get('/me/statistics', authMiddleware, userController.getUserStats);
 
 export default router;
