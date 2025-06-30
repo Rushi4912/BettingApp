@@ -43,7 +43,8 @@ export const authController = {
           username: true,
           email: true,
           password: true,
-          phone: true
+          phone: true,
+          phone:true
         },
       });
       
@@ -66,6 +67,7 @@ export const authController = {
   },
 
   async login(req, res) {
+    
     try {
       const { email, password } = req.body;
 
@@ -96,6 +98,7 @@ export const authController = {
           },
         });
       }
+
 
       res.json({
         user: {
