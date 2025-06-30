@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const app = express();
+const port = process.env.port || 8080;
 
 app.use(express.json());
 
@@ -13,22 +14,25 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/users', async (req, res) => {
-  const { id, username, email } = req.body;
+ const {id,username, email}  = req.body;
 
-  const user = await prisma.user.create({
-    data: {
-      id,
-      username,
-      email,
-      // password,
-      // balance,
-      // currency,
-      // role,
-      // status,
-      // createdAt,
-      // updatatedAt,
-    },
-  });
+    try{
+      const user = await prisma.user.create({
+        data: {
+          id,
+          username,
+          email,
+        },
+      });
+
+      res.json({
+        user,
+      })
+
+    }catch(error){
+
+       console.error(error);
+    }
 });
 
 // app.use('/api', router);
@@ -40,6 +44,6 @@ app.post('/users', async (req, res) => {
 //   });
 // });
 
-app.listen(8080, () => {
+app.listen(port, () => {
   console.log('Server is listening on port 8080');
 });
