@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const authenticate = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
@@ -32,4 +32,4 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-export default { authMiddleware, isAdmin };
+export { authMiddleware, isAdmin };

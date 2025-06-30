@@ -1,15 +1,18 @@
-import { compare, hash } from 'bcryptjs';
-import { sign, verify } from 'jsonwebtoken';
-import { prisma } from '../../../../packages/db/prisma';
+import pkg from 'bcryptjs';
+const { compare, hash } = pkg;
 
-const JWT_SECRET = process.env.JWT_SECRET;
+import jwt from 'jsonwebtoken';
+const { sign } = jwt;
+
+import prisma from '../../../../packages/db/prisma/index.js';
+
 const SALT_ROUNDS = 12;
 
 export const authController = {
   async register(req, res) {
     try {
-      const { username, email, password, phone} = req.body;
-
+      const { username, email, password, phone } = req.body;
+      
       // check if user exists
       const extUser = await prisma.user.findFirst({
         where: { OR: [{ email }, { username }] },
@@ -33,28 +36,23 @@ export const authController = {
           username,
           email,
           password: hashedPassword,
-
           phone
-
-       
-
         },
         select: {
           id: true,
           username: true,
           email: true,
-
+          password: true,
+          phone: true,
           phone:true
-
-       
-
         },
       });
-
+      
       // Generate JWT
-      const token = sign({ userId: user.id }, JWT_SECRET);
-
+      const token = sign({ userId: user.id }, process.env.JWT_SECRET);
+      
       res.status(201).json({
+        user,
         token,
       });
     } catch (error) {
@@ -86,6 +84,8 @@ export const authController = {
           },
         });
       }
+
+      const token = req.headers.au
 
       // verify password
       const isValid = await compare(password, user.password);

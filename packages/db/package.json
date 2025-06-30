@@ -3,6 +3,7 @@
   "name": "@bettingapp/db",
   "version": "1.0.0",
   "main": "./prisma/client.js",
+  "type": "module",
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev"
