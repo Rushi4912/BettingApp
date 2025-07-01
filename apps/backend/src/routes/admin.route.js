@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.get('/users', adminController.listUsers);
 
 // GET /admin/users/:id (Get user details)
-router.get('/users/:id', adminController.getUserDetails);
+// router.get('/users/:id', adminController.getUserDetails);
 
 // POST /admin/users/:id/balance (Adjust user balance)
 // router.post('/users/:id/balance', adminController.adjustBalance);
