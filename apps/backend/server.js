@@ -1,10 +1,11 @@
 import express from 'express';
 
 import router from './src/routes/index.route.js';
-
+import dotenv from 'dotenv';
 
 const app = express();
 const port = process.env.port || 8080;
+dotenv.config();
 
 app.use(express.json());
 
@@ -17,6 +18,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8080, () => {
+app.listen(port, () => {
   console.log('Server is listening on port 8080');
 });
