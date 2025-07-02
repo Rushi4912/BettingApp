@@ -20,9 +20,9 @@ router.post(
 );
 
 // GET /transactions (Get transaction history)
-router.get('/', authMiddleware, transactionController.getTransactionHistory);
+// router.get('/', authMiddleware, transactionController.getTransactionHistory);
 
 // GET /transactions/:id (Get transaction details)
-router.get('/:id', authMiddleware, transactionController.getTransactionDetails);
+// router.get('/:id', authMiddleware, transactionController.getTransactionDetails);
 
 export default router;

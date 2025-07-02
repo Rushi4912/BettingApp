@@ -85,8 +85,6 @@ export const authController = {
         });
       }
 
-      const token = req.headers.au
-
       // verify password
       const isValid = await compare(password, user.password);
 
