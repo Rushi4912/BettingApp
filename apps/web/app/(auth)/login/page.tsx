@@ -47,12 +47,6 @@ export default function LoginPage() {
 
             router.push("/dashboard");
         } catch (error) {
-            //   toast({
-            //     title: "Login failed",
-            //     description: error instanceof Error ? error.message : "Unknown error",
-            //     variant: "destructive",
-            //   });
-
             console.log(error, "Error in login");
 
         }
