@@ -18,6 +18,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
     type: 'STRAIGHT',
     numbers: []
   });
+  const [isSpinning, setIsSpinning] = useState(false);
   
   const socketRef = useRef<WebSocket | null>(null);
   const gameIdRef = useRef<string | null>(initialGame?.id ?? null);
@@ -50,6 +51,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
         case 'NEW_GAME_STARTED':
           gameIdRef.current = data.data.id;
           setGame(data.data);
+          setIsSpinning(false);
           // Join the new game room
           ws.send(JSON.stringify({ 
             action: 'join-game', 
@@ -69,6 +71,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
             ...prev,
             status: 'SPINNING'
           }));
+          setIsSpinning(true);
           break;
           
         case 'GAME_RESULT':
@@ -81,6 +84,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
               payout: data.data.bets.find((b: any) => b.id === bet.id)?.payout
             }))
           }));
+          setIsSpinning(false);
           break;
       }
     };
@@ -109,6 +113,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
           const newGame = await getCurrentGame();
           gameIdRef.current = newGame.id;
           setGame(newGame);
+          setIsSpinning(false);
           
           // Join new game room
           if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -139,7 +144,7 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
       // Reset selected numbers after placing bet
       setSelectedBet(prev => ({
         type: prev.type,  // Keep the same bet type
-        numbers: []       // Only reset numbers
+        numbers: []      
       }));
     } catch (error: any) {
       toast.error(error.message || 'Failed to place bet');
@@ -151,14 +156,29 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
       toast.error("Game not initialized.");
       return;
     }
+
+    if (game.status !== 'WAITING') {
+      toast.error("Cannot spin wheel at this time.");
+      return;
+    }
+
+    if (game.bets.length === 0) {
+      toast.error("Please place at least one bet before spinning.");
+      return;
+    }
   
     try {
+      setIsSpinning(true);
       await spinWheel(game.id);
       toast.success("Wheel spinning!");
     } catch (error: any) {
+      setIsSpinning(false);
       toast.error(error?.message || "Failed to start spin");
     }
   };
+
+  // Check if spin button should be disabled
+  const isSpinDisabled = game?.status !== 'WAITING' || game?.bets.length === 0 || isSpinning;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white py-10 ">
@@ -177,48 +197,71 @@ const RouletteGame = ({ initialGame }: { initialGame: RouletteGameWithBets }) =>
               
               {/* Fixed Wheel Container with Perfect Alignment */}
               <div className="flex justify-center items-center mb-6">
-                <div className="relative w-80 h-80 bg-gray-900 rounded-full border-4 border-gray-700 shadow-2xl overflow-hidden">
-                  {/* Wheel positioning container */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-full relative">
-                      <RouletteWheel 
-                        isSpinning={game?.status === 'SPINNING'} 
-                        result={game?.result} 
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Center dot/pointer for better visual alignment */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-400 rounded-full border-2 border-gray-800 shadow-lg z-10"></div>
-                  
-                  {/* Top pointer/indicator */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-yellow-400 z-20"></div>
-                </div>
-              </div>
+  <div className="relative w-[440px] h-[440px] bg-gradient-to-br from-gray-800 to-gray-900 rounded-full border-4 border-gray-600 shadow-2xl overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center">
+      <RouletteWheel
+        isSpinning={isSpinning || game?.status === 'SPINNING'}
+        result={game?.result}
+      />
+    </div>
+    {/* pointer stays exactly as before */}
+    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-b-[20px] border-l-transparent border-r-transparent border-b-yellow-400 shadow-lg z-20">
+      <div className="absolute top-[20px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[12px] border-l-transparent border-r-transparent border-b-yellow-500"></div>
+    </div>
+  </div>
+</div>
 
-              {/* Spin Button */}
-              <button
-                onClick={handleSpin}
-                disabled={game?.status !== 'WAITING' || game?.bets.length === 0}
-                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed
-                         text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 
-                         shadow-lg hover:shadow-xl text-lg uppercase tracking-wider"
-              >
-                {game?.status === 'SPINNING' ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Spinning...
-                  </div>
-                ) : (
-                  'Spin Wheel'
-                )}
-              </button>
+
+              {/* Professional Spin Button */}
+              <div className="flex justify-center">
+  <button
+    onClick={handleSpin}
+    disabled={isSpinDisabled}
+    className={`
+      relative flex items-center justify-center gap-3
+      px-8 py-4
+      rounded-full
+      font-medium text-lg uppercase tracking-wide
+      transition-transform duration-200
+      ${isSpinDisabled
+        ? 'bg-gray-700 text-gray-400 cursor-not-allowed shadow-inner'
+        : 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-red-300'
+      }
+    `}
+  >
+    {isSpinning || game?.status === 'SPINNING' ? (
+      <>
+        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        Spinning…
+      </>
+    ) : (
+      <>
+        Spin Wheel
+      </>
+    )}
+  </button>
+</div>
+
+
               
-              {game?.status === 'WAITING' && game?.bets.length === 0 && (
-                <p className="text-sm text-gray-400 mt-2 text-center">
-                  Place a bet to spin the wheel
-                </p>
-              )}
+              {/* Status Messages */}
+              <div className="mt-3 text-center">
+                {game?.status === 'WAITING' && game?.bets.length === 0 && (
+                  <p className="text-xs text-gray-400">
+                    Place a bet to spin the wheel
+                  </p>
+                )}
+                {game?.status === 'SPINNING' && (
+                  <p className="text-xs text-yellow-400 animate-pulse">
+                    Good luck! 🍀
+                  </p>
+                )}
+                {game?.status === 'COMPLETED' && (
+                  <p className="text-xs text-green-400">
+                    Game completed! New game starting soon...
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Game Status */}
