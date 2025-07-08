@@ -22,6 +22,10 @@ model User {
 
   bets          Bet[]
   transactions  Transaction[]
+  verification  Verification?
+  sessions      Session[]
+
+  @@map("users")
 }
 
 enum Role {
@@ -35,78 +39,237 @@ enum Status {
   BANNED
 }
 
-model Game {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  type        GameType
-  description String
-  rules       String?
-  minBet      Float
-  maxBet      Float
-  features    String[]
-  thumbnail   String?
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  bets          Bet[]
-}
-
-enum GameType {
-  SLOTS
-  BLACKJACK
-  ROULETTE
-  POKER
-  BACCARAT
-  CRAPS
-  KENO
-  BINGO
-  SPORTS
-  OTHER
-}
-
-model Bet {
+model Verification {
   id        String   @id @default(uuid())
-  amount    Float
-  result    BetResult
-  winAmount Float    @default(0)
-  parameters Json?
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  document  String   
+  status    VerificationStatus @default(PENDING)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  game   Game   @relation(fields: [gameId], references: [id])
-  gameId String
+  @@map("verifications")
 }
 
-enum BetResult {
-  WIN
-  LOSS
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  token        String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@map("sessions")
+}
+
+
+// Optional
+// model Wallet {
+  // id        String   @id @default(uuid())
+  // userId    String   @unique
+  // balance   Float    @default(0)
+  // updatedAt DateTime @updatedAt
+
+  // user      User     @relation(fields: [userId], references: [id])
+// }
+
+
+// For multi-sports betting
+model Sport {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  slug        String     @unique
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  leagues     League[]
+  matches     Match[]
+  @@map("sports")
+}
+
+// For multi-sports betting
+model League {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  sportId     String
+  sport       Sport      @relation(fields: [sportId], references: [id])
+  country     String?
+  logo        String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  matches     Match[]
+
+  @@map("leagues")
+}
+
+
+// For multi-sports betting
+model Team {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  sportId     String
+  sport       Sport      @relation(fields: [sportId], references: [id])
+  logo        String?
+  country     String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  homeMatches Match[]    @relation("HomeTeam")
+  awayMatches Match[]    @relation("AwayTeam")
+
+  @@map("teams")
+  MatchResult MatchResult[]  //Optional
+}
+
+// For multi-sports betting
+model Match {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  sportId     String
+  sport       Sport      @relation(fields: [sportId], references: [id])
+  leagueId    String
+  league      League     @relation(fields: [leagueId], references: [id])
+  homeTeamId  String
+  homeTeam    Team       @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamId  String
+  awayTeam    Team       @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  startTime   DateTime
+  status      MatchStatus @default(UPCOMING)
+  result      MatchResult?
+  odds        Odds[]
+  bets        Bet[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  isSettled   Boolean    @default(false)
+  OutcomeNote String?
+
+  @@map("matches")
+}
+
+enum MatchStatus {
+  UPCOMING
+  LIVE
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+// Match outcomes
+model MatchResult {
+  id          String     @id @default(uuid())
+  matchId     String     @unique
+  match       Match      @relation(fields: [matchId], references: [id])
+  winnerId    String?    // null for draws
+  winner      Team?      @relation(fields: [winnerId], references: [id])
+  homeScore   Int?
+  awayScore   Int?
+  isDraw      Boolean    @default(false)
+  details     Json?      // For storing additional match-specific details
+  createdAt   DateTime   @default(now())
+
+  @@map("match_results")
+}
+
+// For storing current outcomes for match
+model Odds {
+  id          String     @id @default(uuid())
+  matchId     String
+  match       Match      @relation(fields: [matchId], references: [id])
+  homeWin     Float
+  awayWin     Float
+  draw        Float?     // Not all sports have draw options
+  lastUpdated DateTime   @default(now())
+  bets        Bet[]
+
+  @@map("odds")
+}
+
+// Bet tracking
+model Bet {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  matchId     String
+  match       Match      @relation(fields: [matchId], references: [id])
+  oddsId      String
+  odds        Odds       @relation(fields: [oddsId], references: [id])
+  amount      Float
+  predicted   BetPrediction
+  potentialWin Float
+  status      BetStatus  @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("bets")
+  // For high frequency search col
+  @@index([userId])
+  @@index([matchId])
+}
+
+enum BetPrediction {
+  HOME_WIN
+  AWAY_WIN
+  DRAW
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  CANCELLED
+  REFUNDED
 }
 
 model Transaction {
-  id          String     @id @default(uuid())
-  type        TransactionType
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
   amount      Float
-  method      String?
-  currency    String?
-  status      TransactionStatus
-  description String?
-  createdAt   DateTime   @default(now())
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  reference   String?      @unique
+  method      PaymentMethod
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  currency    String       @default("INR")
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  @@map("transactions")
+  @@index([userId])
 }
 
 enum TransactionType {
   DEPOSIT
   WITHDRAWAL
+  BET_PLACED
+  BET_WON
+  BET_REFUND
 }
 
 enum TransactionStatus {
   PENDING
   COMPLETED
   FAILED
-  CANCELLED
 }
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  CRYPTO
+  OTHER
+}
+
